@@ -4,6 +4,7 @@ function getData() {
     if (text != "") {
         document.getElementById("result").textContent = "loading..."
         console.log("sending request...")
+        //check the duckduckgo api
         fetch(`https://api.duckduckgo.com/?q=${text}&format=json&origin=*`).
             then(response => {
                 if (!response.ok) {
@@ -14,13 +15,12 @@ function getData() {
             .then(data => {
                 console.log(data)
                 if (data["Abstract"] != "") {
+                    //get the duckduckgo response
                     console.log(data)
-                    document.getElementById("result").innerHTML = `${data["Image"]!=""?`<img class="descImg" src="https://duckduckgo.com${data["Image"]}">`:""}${data["Abstract"]}<br><br>Source: <a href="${data["AbstractURL"]}">${data["AbstractSource"]}</a><br>Website: <a href="https://${data["OfficialDomain"]}">${data["OfficialDomain"]}</a>`
+                    document.getElementById("result").innerHTML = `${data["Image"]!=""?`<img class="descImg" src="https://duckduckgo.com${data["Image"]}"><br>`:""}${data["Abstract"]}<br><br>Source: <a href="${data["AbstractURL"]}">${data["AbstractSource"]}</a><br>Website: <a href="https://${data["OfficialDomain"]}">${data["OfficialDomain"]}</a>`
                 } else {
-                    let worked = GetWiki(text)
-                    if (!worked) {
-                        //document.getElementById("result").textContent = "Couldn't find a description"
-                    }
+                    //if duckduckgo isn't helpful, use wikipedia api
+                    GetWiki(text)
                 }
             }).
             catch(err => {
@@ -32,6 +32,7 @@ function getData() {
 
 function fetchWikiPageData(name,id) {
     let worked = false
+    //search wikipedia for the name
     fetch(
       `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&titles=${name}&prop=extracts&prop=extracts|pageimages&piprop=original&exintro=1`
     )
@@ -42,20 +43,23 @@ function fetchWikiPageData(name,id) {
         return response.json();
       })
         .then((data) => {
-        console.log(data)
-        ItemData = data["query"]["pages"][id.toString()];
-        answer = ItemData["extract"];
+            console.log(data)
+            //find the right page and get the wikipedua text
+            ItemData = data["query"]["pages"][id.toString()];
+            answer = ItemData["extract"];
+            //check if it is valid
             if (answer.length - (name.length * 2) == 44) {
                 worked = false
                 return
             }
-        let image = ""
-        if (ItemData["original"]) {
+            let image = ""
+            if (ItemData["original"]) {
             image = ItemData["original"]["source"]
-        }
-            document.getElementById("result").innerHTML = `<img class="descImg" src="${image}">` + answer;
-        image=""
-        worked = true;
+            }
+            //write the data to the screen
+            document.getElementById("result").innerHTML = `<img class="descImg" src="${image}"><br>` + answer;
+            image=""
+            worked = true;
       })
       .catch((error) => {
         console.log(name,error);
@@ -66,6 +70,7 @@ function fetchWikiPageData(name,id) {
 
 function GetWiki(text) {
     let worked = false
+    //search wikipedia for users query
     fetch(
       `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&list=search&srlimit=500&srsearch=${text}`
     ).
@@ -75,9 +80,12 @@ function GetWiki(text) {
         }
         return response.json()
     }).then(data => {
+        //get first result
         search = data["query"]["search"][0];
         let name = search["title"]
-        didWork = fetchWikiPageData(name,  search["pageid"])
+        //fetch a long extract giving information
+        didWork = fetchWikiPageData(name, search["pageid"])
+        //if it doesn't work then just use a small snippet
         if (!didWork) {
             document.getElementById("result").innerHTML=search["snippet"]
         }
