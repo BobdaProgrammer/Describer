@@ -1,0 +1,44 @@
+.descCard{
+    margin: auto;
+    text-align: center;
+    width: 80vh;
+    border: 2px solid grey;
+    border-radius: 5px;
+    font-family: "Montserrat";
+    padding: 5px;
+}
+
+.descImg{
+    max-width: 78vh;
+    max-height: 40vh;
+    margin: auto;
+}
+#search{
+    outline: none;
+    border: none;
+    border-radius: 2px;
+    text-align: center;
+}
+.searchbar{
+    width: 80vh;
+    margin: auto;
+    padding: 5px;
+    box-shadow: 2px 2px rgba(104, 104, 104, 0.466);
+    text-align: center;
+    border-radius: 5px;
+    border: 1px solid rgba(104, 104, 104, 0.466);
+    margin-bottom: 5px;
+}
+
+/* Styles for phones */
+@media only screen and (max-width: 768px) {
+    .searchbar{
+        width: 52vh;
+    }
+    .descCard{
+        width: 52vh;
+    }
+    .descImg{
+        width: 50vh;
+    }
+}
