@@ -1,4 +1,6 @@
 let CountryFacts = ""
+let snippet = ""
+
 
 function getData() {
     text = document.getElementById("search").value
@@ -57,7 +59,7 @@ function fetchWikiPageData(name,id) {
             image = ItemData["original"]["source"]
             }
             //write the data to the screen
-            document.getElementById("result").innerHTML = `<img class="descImg" src="${image}"><br>`+CountryFacts + answer;
+            document.getElementById("result").innerHTML = `<img class="descImg" src="${image}"><br><br><details><summary>Quick summary</summary><p>${snippet}</p></details><br>`+CountryFacts + answer;
             image=""
             worked = true;
       })
@@ -85,6 +87,7 @@ function GetWiki(text) {
         let name = search["title"]
         //fetch a long extract giving information
         didWork = fetchWikiPageData(name, search["pageid"])
+        snippet = search["snippet"]
         //if it doesn't work then just use a small snippet
         if (!didWork) {
             document.getElementById("result").innerHTML=search["snippet"]
@@ -127,14 +130,14 @@ function getCountryStats(name) {
             currencies.push(data["currencies"][key]["name"])
         }
         CountryFacts = `
-        <span><strong>${name}'s statistics</strong></span><ul>
+        <span><strong>${name}'s statistics</strong></span><br>
         `
-        CountryFacts += `<li>Languages spoken: ${languages.toString().replace(/,/g, ", ")}</li>`;
-        CountryFacts += `<li>Population: ${population}</li>`
-        CountryFacts += `<li>Driving side: ${drivingSide}</li>`;
-        CountryFacts += `<li>Gini: ${gini}</li>`;
-        CountryFacts += `<li>Capital: ${capital}</li>`;
-        CountryFacts += `<li>Currencies: ${currencies.toString().replace(/,/g, ", ")}</li></ul>`;
+        CountryFacts += `Languages spoken: ${languages.toString().replace(/,/g, ", ")}<br>`;
+        CountryFacts += `Population: ${population}<br>`
+        CountryFacts += `Driving side: ${drivingSide}<br>`;
+        CountryFacts += `Gini: ${gini}<br>`;
+        CountryFacts += `Capital: ${capital}<br>`;
+        CountryFacts += `Currencies: ${currencies.toString().replace(/,/g, ", ")}<br>`;
     }).catch(err => {
         console.log(err)
     })
