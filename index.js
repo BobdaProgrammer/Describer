@@ -1,3 +1,5 @@
+let CountryFacts = ""
+
 function getData() {
     text = document.getElementById("search").value
     text = text.trim()
@@ -13,11 +15,10 @@ function getData() {
                 return response.json()
             })
             .then(data => {
-                console.log(data)
+                getCountryStats(text)
                 if (data["Abstract"] != "") {
                     //get the duckduckgo response
-                    console.log(data)
-                    document.getElementById("result").innerHTML = `${data["Image"]!=""?`<img class="descImg" src="https://duckduckgo.com${data["Image"]}"><br>`:""}${data["Abstract"]}<br><br>Source: <a href="${data["AbstractURL"]}">${data["AbstractSource"]}</a><br>Website: <a href="https://${data["OfficialDomain"]}">${data["OfficialDomain"]}</a>`
+                    document.getElementById("result").innerHTML = `${data["Image"]!=""?`<img class="descImg" src="https://duckduckgo.com${data["Image"]}"><br>`:""}${CountryFacts}${data["Abstract"]}<br><br>Source: <a href="${data["AbstractURL"]}">${data["AbstractSource"]}</a><br>Website: <a href="https://${data["OfficialDomain"]}">${data["OfficialDomain"]}</a>`
                 } else {
                     //if duckduckgo isn't helpful, use wikipedia api
                     GetWiki(text)
@@ -43,7 +44,6 @@ function fetchWikiPageData(name,id) {
         return response.json();
       })
         .then((data) => {
-            console.log(data)
             //find the right page and get the wikipedua text
             ItemData = data["query"]["pages"][id.toString()];
             answer = ItemData["extract"];
@@ -57,7 +57,7 @@ function fetchWikiPageData(name,id) {
             image = ItemData["original"]["source"]
             }
             //write the data to the screen
-            document.getElementById("result").innerHTML = `<img class="descImg" src="${image}"><br>` + answer;
+            document.getElementById("result").innerHTML = `<img class="descImg" src="${image}"><br>`+CountryFacts + answer;
             image=""
             worked = true;
       })
@@ -97,6 +97,47 @@ function GetWiki(text) {
 
     })
     return worked
+}
+
+function getCountryStats(name) {
+    fetch(
+        `https://restcountries.com/v3.1/name/${name}
+    `)
+    .then(response => {
+        if (!response.ok) {
+            throw "Couldn't find Country"
+        }    
+        return response.json()
+    }).then(data => {
+        data=data["0"]
+        languages = []
+        for (key in data["languages"]){
+            languages.push(data["languages"][key])
+        }
+        console.log(languages)
+        let population = data["population"]
+        let drivingSide = data["car"]["side"]
+        let gini = ""
+        for (key in data["gini"]) {
+            gini = key+": "+data["gini"][key]
+        }
+        let capital = data["capital"][0]
+        let currencies = []
+        for (key in data["currencies"]){
+            currencies.push(data["currencies"][key]["name"])
+        }
+        CountryFacts = `
+        <span><strong>${name}'s statistics</strong></span><ul>
+        `
+        CountryFacts += `<li>Languages spoken: ${languages.toString().replace(/,/g, ", ")}</li>`;
+        CountryFacts += `<li>Population: ${population}</li>`
+        CountryFacts += `<li>Driving side: ${drivingSide}</li>`;
+        CountryFacts += `<li>Gini: ${gini}</li>`;
+        CountryFacts += `<li>Capital: ${capital}</li>`;
+        CountryFacts += `<li>Currencies: ${currencies.toString().replace(/,/g, ", ")}</li></ul>`;
+    }).catch(err => {
+        console.log(err)
+    })
 }
 
 document.getElementById("search").addEventListener("keydown", function (event) {
