@@ -103,7 +103,7 @@ function GetWiki(text) {
 }
 
 function getCountryStats(name) {
-    Country facts = "";
+    CountryFacts = "";
     fetch(
         `https://restcountries.com/v3.1/name/${name}
     `)
